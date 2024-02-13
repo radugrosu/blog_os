@@ -28,13 +28,12 @@ pub extern "C" fn _start() -> ! {
     println!("Hello World this is a very long message that shoulnd't wrap around and should produce a failure of some sort{}", "!");
     // panic!("Some panic message");
 
+    // initialize the IDT
     blog_os::init();
 
     unsafe {
         *(0xdeadbeef as *mut u8) = 42;
     };
-
-    // x86_64::instructions::interrupts::int3();
 
     #[cfg(test)]
     test_main();
