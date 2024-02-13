@@ -1,4 +1,4 @@
-use crate::println;
+use crate::{gdt, println};
 use x86_64::structures::idt::{InterruptDescriptorTable, InterruptStackFrame};
 
 use lazy_static::lazy_static;
@@ -8,6 +8,10 @@ lazy_static! {
         let mut idt = InterruptDescriptorTable::new();
         idt.breakpoint.set_handler_fn(breakpoint_handler);
         idt.double_fault.set_handler_fn(double_fault_handler);
+        unsafe {
+            idt.double_fault.set_handler_fn(double_fault_handler)
+                .set_stack_index(gdt::DOUBLE_FAULT_IST_INDEX);
+        }
         idt
     };
 }
@@ -28,6 +32,6 @@ extern "x86-interrupt" fn double_fault_handler(
 
 #[test_case]
 fn test_breakpoint_exception() {
-    // invoke a breakpoint exception
+    // invoke a breakpoint exception and continue execution
     x86_64::instructions::interrupts::int3();
 }
